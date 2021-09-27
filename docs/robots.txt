@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://longxiaofei.github.io/sitemap.xml
