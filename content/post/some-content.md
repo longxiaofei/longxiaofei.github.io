@@ -1,9 +1,9 @@
 ---
-title: "Some Content"
+title: "测试文章-之后会删掉"
 date: 2021-09-27T09:21:42+08:00
-draft: true
+draft: false
 categories: ["测试"]
-tags: ["无敌", "调度"]
+tags: ["测试"]
 ---
 
 ## 1

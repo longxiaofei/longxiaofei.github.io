@@ -5,14 +5,30 @@
     <link>https://longxiaofei.github.io/</link>
     <description>Recent content on libra blog</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language><atom:link href="https://longxiaofei.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Mon, 27 Sep 2021 09:21:42 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>测试文章-之后会删掉</title>
+      <link>https://longxiaofei.github.io/post/some-content/</link>
+      <pubDate>Mon, 27 Sep 2021 09:21:42 +0800</pubDate>
+      
+      <guid>https://longxiaofei.github.io/post/some-content/</guid>
+      <description>1 code 1 print(&amp;#34;hello world&amp;#34;) python hello world 1 print(&amp;#34;hello world&amp;#34;) 测试 这是测试 这也是测试 这还是测试 测试无敌 1 2 3</description>
+    </item>
+    
     <item>
       <title></title>
       <link>https://longxiaofei.github.io/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://longxiaofei.github.io/about/</guid>
-      <description>哈哈哈哈</description>
+      <description>关于我   Pythonista, 全栈工程师(什么都会点皮毛), 半吊子数据工程师
+  社恐症患者, 曾今的中二少年, 迷茫的社会青年
+  山东汉子, 在北京待了三年, 现定居杭州
+  之前在VC、公募基金的数据部门待过三年，现在在一家电商ISV公司养老(感谢公司)
+  关于网站   为了缓解一下自身压力?
+  希望能够坚持写些东西
+  </description>
     </item>
     
   </channel>

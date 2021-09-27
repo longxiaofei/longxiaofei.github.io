@@ -2,30 +2,61 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://longxiaofei.github.io/about/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://longxiaofei.github.io/categories/</loc>
+    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://longxiaofei.github.io/</loc>
+    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://longxiaofei.github.io/series/</loc>
+    <loc>https://longxiaofei.github.io/post/</loc>
+    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://longxiaofei.github.io/tags/</loc>
+    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/tags/%E6%B5%8B%E8%AF%95/</loc>
+    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/categories/%E6%B5%8B%E8%AF%95/</loc>
+    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/post/some-content/</loc>
+    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/about/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/series/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
