@@ -3,49 +3,56 @@
   
   <url>
     <loc>https://longxiaofei.github.io/categories/</loc>
-    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
+    <lastmod>2021-10-05T08:50:14+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/tags/elasticsearch/</loc>
+    <lastmod>2021-10-05T08:50:14+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/categories/elasticsearch/</loc>
+    <lastmod>2021-10-05T08:50:14+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/post/elelasticsearch%E7%9A%84%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B/</loc>
+    <lastmod>2021-10-05T08:50:14+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://longxiaofei.github.io/</loc>
-    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
+    <lastmod>2021-10-05T08:50:14+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://longxiaofei.github.io/post/</loc>
-    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
+    <lastmod>2021-10-05T08:50:14+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://longxiaofei.github.io/tags/</loc>
-    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
+    <lastmod>2021-10-05T08:50:14+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://longxiaofei.github.io/tags/%E6%B5%8B%E8%AF%95/</loc>
-    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://longxiaofei.github.io/categories/%E6%B5%8B%E8%AF%95/</loc>
-    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://longxiaofei.github.io/post/some-content/</loc>
-    <lastmod>2021-09-27T09:21:42+08:00</lastmod>
+    <loc>https://longxiaofei.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
+    <lastmod>2021-10-05T08:50:14+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
