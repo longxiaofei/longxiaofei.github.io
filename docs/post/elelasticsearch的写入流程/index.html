@@ -49,7 +49,7 @@
 <meta itemprop="name" content="Elelasticsearch的写入流程">
 <meta itemprop="description" content="粗略整理了一下elasticsearch写入数据的流程, 有不对的地方希望指正, 下面elasticsearh简称为es。 提出的问题 es数据写入"><meta itemprop="datePublished" content="2021-10-05T08:50:14+08:00" />
 <meta itemprop="dateModified" content="2021-10-05T08:50:14+08:00" />
-<meta itemprop="wordCount" content="1332">
+<meta itemprop="wordCount" content="1324">
 <meta itemprop="keywords" content="elasticsearch,数据库," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Elelasticsearch的写入流程"/>
 <meta name="twitter:description" content="粗略整理了一下elasticsearch写入数据的流程, 有不对的地方希望指正, 下面elasticsearh简称为es。 提出的问题 es数据写入"/>
@@ -136,7 +136,7 @@
         <div class="post-category">
             <a href="/categories/elasticsearch/"> elasticsearch </a>
             </div>
-          <span class="more-meta"> 约 1332 字 </span>
+          <span class="more-meta"> 约 1324 字 </span>
           <span class="more-meta"> 预计阅读 3 分钟 </span>
         <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
       </div>
@@ -192,7 +192,7 @@
 </ul>
 </li>
 <li>
-<p>将操作数据日志写入translog内存缓冲区</p>
+<p>将操作数据日志写入translog内存缓冲区</p>
 <ul>
 <li>这一步骤在2之后进行</li>
 <li>在7.x默认配置下，1、2、3、6步骤是同步执行的，只有当6步骤执行完后，才会向客户端返回成功的响应。</li>
@@ -224,7 +224,7 @@
 <li>
 <p>merge操作</p>
 <ul>
-<li>将磁盘中小的segment进行合并，并&quot;真正删除&quot;已删除的文档。<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html">文档</a></li>
+<li>将磁盘中小的segment进行合并，并&quot;真正删除&quot;已删除的文档。<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html">文档</a></li>
 <li>防止小的segment过多，影响检索效率。</li>
 </ul>
 </li>
@@ -239,7 +239,7 @@
 <p><img src="/img/es-write/1.png" alt=""></p>
 <h3 id="写入流程-1">写入流程</h3>
 <ol>
-<li>客户端写请求发送至node-1</li>
+<li>客户端写请求发送至node-1</li>
 </ol>
 <ul>
 <li>node根据&quot;路由规则&quot;计算出数据应该存在分片shard-0上。</li>

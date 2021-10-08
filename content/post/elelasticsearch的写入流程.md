@@ -25,7 +25,7 @@ tags: ["elasticsearch", "数据库"]
 2. 对数据进行格式化
     * 对文档数据进行处理和验证
 
-3. 将操作数据日志写入translog内存缓冲区
+3. 将操作数据日志写入translog内存缓冲区
     * 这一步骤在2之后进行
     * 在7.x默认配置下，1、2、3、6步骤是同步执行的，只有当6步骤执行完后，才会向客户端返回成功的响应。
     * 如果想要提高写入的效率，并且接受在发生故障丢失一部分数据，可以将6步骤设为异步定时批量执行，具体说明见文档：[文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/index-modules-translog.html)
@@ -44,7 +44,7 @@ tags: ["elasticsearch", "数据库"]
     * 默认为同步。相关说明在3步骤中已说明，不再赘述。
 
 7. merge操作
-    * 将磁盘中小的segment进行合并，并"真正删除"已删除的文档。[文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html)
+    * 将磁盘中小的segment进行合并，并"真正删除"已删除的文档。[文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-merge.html)
     * 防止小的segment过多，影响检索效率。
 
 ### 总结
@@ -59,7 +59,7 @@ tags: ["elasticsearch", "数据库"]
 ![](/img/es-write/1.png)
 
 ### 写入流程
-1. 客户端写请求发送至node-1
+1. 客户端写请求发送至node-1
 * node根据"路由规则"计算出数据应该存在分片shard-0上。
 * 通过集群维护的分片元数据查找得到shard-0主分片位于node0节点上。
 * 将请求转发给node0节点
