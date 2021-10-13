@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>elasticsearch on libra blog</title>
+    <title>Elasticsearch on libra blog</title>
     <link>https://longxiaofei.github.io/categories/elasticsearch/</link>
-    <description>Recent content in elasticsearch on libra blog</description>
+    <description>Recent content in Elasticsearch on libra blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Tue, 05 Oct 2021 08:50:14 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/categories/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Elelasticsearch的写入流程</title>
-      <link>https://longxiaofei.github.io/post/elelasticsearch%E7%9A%84%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B/</link>
+      <title>Elasticsearch的写入流程</title>
+      <link>https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B/</link>
       <pubDate>Tue, 05 Oct 2021 08:50:14 +0800</pubDate>
       
-      <guid>https://longxiaofei.github.io/post/elelasticsearch%E7%9A%84%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B/</guid>
-      <description>粗略整理了一下elasticsearch写入数据的流程, 有不对的地方希望指正, 下面elasticsearh简称为es。 提出的问题 es数据写入</description>
+      <guid>https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B/</guid>
+      <description>粗略整理了一下Elasticsearch写入数据的流程, 有不对的地方希望指正, 下面Elasticsearch简称为es。 提出的问题 es数据写</description>
     </item>
     
   </channel>

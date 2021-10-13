@@ -1,12 +1,12 @@
 ---
-title: "Elelasticsearch的写入流程"
+title: "Elasticsearch的写入流程"
 date: 2021-10-05T08:50:14+08:00
 draft: false
-categories: ["elasticsearch"]
-tags: ["elasticsearch", "数据库"]
+categories: ["Elasticsearch"]
+tags: ["Elasticsearch", "数据库"]
 ---
 
-> 粗略整理了一下elasticsearch写入数据的流程, 有不对的地方希望指正, 下面elasticsearh简称为es。
+> 粗略整理了一下Elasticsearch写入数据的流程, 有不对的地方希望指正, 下面Elasticsearch简称为es。
 
 ## 提出的问题
 * es数据写入操作响应成功后，es随即崩溃，数据会丢吗?
