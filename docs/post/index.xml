@@ -6,7 +6,16 @@
     <description>Recent content in Posts on libra blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 05 Oct 2021 08:50:14 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 27 Oct 2021 22:00:14 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Elasticsearch的查询原理(上)</title>
+      <link>https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%8A/</link>
+      <pubDate>Wed, 27 Oct 2021 22:00:14 +0800</pubDate>
+      
+      <guid>https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%8A/</guid>
+      <description>粗略整理了一下Elasticsearch查询的原理, 这一篇主要是关于Elasticsearch单分片查询的原理, 由于Elasticsearc</description>
+    </item>
+    
     <item>
       <title>Elasticsearch的写入流程</title>
       <link>https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B/</link>
