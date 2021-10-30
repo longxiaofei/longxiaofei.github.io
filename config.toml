@@ -145,10 +145,10 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
     warn = 180              # Display warning if the last modified time is more than these days ago.    # 如果文章最后更新于这天数之前，显示警告
 
   [params.gitalk]           # Gitalk is a comment system based on GitHub issues. see https://github.com/gitalk/gitalk
-    owner = ""              # Your GitHub ID
-    repo = ""               # The repo to store comments
-    clientId = ""           # Your client ID
-    clientSecret = ""       # Your client secret
+    owner = "longxiaofei"              # Your GitHub ID
+    repo = "blog-talk"               # The repo to store comments
+    clientId = "1a17cbb09ea46122583b"           # Your client ID
+    clientSecret = "ed0d1346838067fc47fd438c34a983eac9946ca8"       # Your client secret
 
   [params.busuanzi]         # count web traffic by busuanzi                             # 是否使用不蒜子统计站点访问量
     enable = true
