@@ -6,7 +6,16 @@
     <description>Recent content on libra blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 31 Oct 2021 16:06:11 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 06 Nov 2021 18:06:11 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Elasticsearch的查询原理(下)</title>
+      <link>https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%8B/</link>
+      <pubDate>Sat, 06 Nov 2021 18:06:11 +0800</pubDate>
+      
+      <guid>https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%8B/</guid>
+      <description>多分片查询 es查询分为两个阶段&amp;quot;query&amp;quot;和&amp;quot;fetch&amp;quot;，称为&amp;quot;query then fetch</description>
+    </item>
+    
     <item>
       <title>Elasticsearch的查询原理(中)</title>
       <link>https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%AD/</link>

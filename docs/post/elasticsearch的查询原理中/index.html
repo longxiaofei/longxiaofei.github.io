@@ -49,7 +49,7 @@
 <meta itemprop="name" content="Elasticsearch的查询原理(中)">
 <meta itemprop="description" content="BKD Tree范围查询 BKD树是BSP(Binary space partitioning)树家族中的一员，大部分BSP树常用于图像渲染等业务中，也有部分B"><meta itemprop="datePublished" content="2021-10-31T16:06:11+08:00" />
 <meta itemprop="dateModified" content="2021-10-31T16:06:11+08:00" />
-<meta itemprop="wordCount" content="2285">
+<meta itemprop="wordCount" content="2283">
 <meta itemprop="keywords" content="Elasticsearch,数据库," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Elasticsearch的查询原理(中)"/>
 <meta name="twitter:description" content="BKD Tree范围查询 BKD树是BSP(Binary space partitioning)树家族中的一员，大部分BSP树常用于图像渲染等业务中，也有部分B"/>
@@ -136,7 +136,7 @@
         <div class="post-category">
             <a href="/categories/elasticsearch/"> Elasticsearch </a>
             </div>
-          <span class="more-meta"> 约 2285 字 </span>
+          <span class="more-meta"> 约 2283 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
       </div>
@@ -206,7 +206,7 @@
 <blockquote>
 <p>BKD树包含一组平衡的KD树，每个KD树类似于KDB树一样在磁盘中存储，为了存储KD树在磁盘上，我们让每个叶子节点存B个点，这样，数据点被存储到N/B个块中。为了存储KD树的内部节点，我们执行以下的算法，设Bi为一个块中适合的节点数，Bi为2的某个正整数幂，首先假设N/B是Bi的一个精确的幂，这样的话内部节点能够很简单存储在O(N/(BBi))个块中。</p>
 </blockquote>
-<p>上面两段话是对论文部分内容的翻译，上面的&quot;KD树&quot;是指一个新的KD树变种，之后文章中提到的&quot;KD树&quot;，都是指&quot;KD树&quot;的变种，这种KD树是完全二叉树和B+树的结合，下面我们来看一下它在Lucene是如何实现的(我之前用论文的方法实现, 发现了一堆bug, 可能是我对某些英文单词理解的不够准确?)。</p>
+<p>上面两段话是对论文部分内容的翻译，上面的&quot;KD树&quot;是指一个新的KD树变种，之后文章中提到的&quot;KD树&quot;，都是指&quot;KD树&quot;的变种，这种KD树是完全二叉树和B+树的结合，下面我们来看一下它在Lucene是如何实现的(我之前用论文的方法实现, 发现了一堆bug, 可能是我对某些英文单词理解的不够准确?)。</p>
 <ol>
 <li>指定存储数据块的最大存储大小B。</li>
 <li>先对所有值进行排序。</li>
@@ -232,7 +232,7 @@
 </ol>
 <p>因为<code>from+size</code>不会特别大，维护堆的内存成本不高，而且读DocValues的性能很高，所以Lucene排序的性能也就很高。</p>
 <h2 id="结语">结语</h2>
-<p>BKD树这一块的东西真的磨了好久，其余大多数的东西也都是不求甚解地去看的，不会扣地特别细，Lucene在代码实现中，基于这些数据结构又做了很多的细节上的优化，有兴趣的大哥们可以自己去扣源码哈，这里就不展开，因为我头快秃了。下一篇会简单介绍一下Elasticsearch多分片多副本的查询原理。</p>
+<p>BKD树这一块的东西真的磨了好久，其余大多数的东西也都是不求甚解地去看的，不会扣地特别细，Lucene在代码实现中，基于这些数据结构又做了很多的细节上的优化，有兴趣的大哥们可以自己去扣源码哈，这里就不展开，因为我头快秃了。下一篇会简单介绍一下Elasticsearch多分片多副本的查询原理。</p>
 <h2 id="引用">引用</h2>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/K-d_tree">KD树wiki</a></li>
@@ -263,7 +263,11 @@
           <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%8B/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Elasticsearch的查询原理(下)</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%8A/">
             <span class="next-text nav-default">Elasticsearch的查询原理(上)</span>
             <span class="next-text nav-mobile">下一篇</span>

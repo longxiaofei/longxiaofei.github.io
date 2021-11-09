@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Elasticsearch的查询原理(下) - libra blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="libra" /><meta name="description" content="多分片查询 es查询分为两个阶段&amp;quot;query&amp;quot;和&amp;quot;fetch&amp;quot;，称为&amp;quot;query then fetch" /><meta name="keywords" content="libra, longxiaofei, douding, blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.88.1 with theme even" />
+
+
+<link rel="canonical" href="https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%8B/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.f92fd13721ddf72129410fd8250e73152cc6f2438082b6c0208dc24ee7c13fc4.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Elasticsearch的查询原理(下)" />
+<meta property="og:description" content="多分片查询 es查询分为两个阶段&quot;query&quot;和&quot;fetch&quot;，称为&quot;query then fetch" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://longxiaofei.github.io/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%8B/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2021-11-06T18:06:11+08:00" />
+<meta property="article:modified_time" content="2021-11-06T18:06:11+08:00" />
+
+<meta itemprop="name" content="Elasticsearch的查询原理(下)">
+<meta itemprop="description" content="多分片查询 es查询分为两个阶段&quot;query&quot;和&quot;fetch&quot;，称为&quot;query then fetch"><meta itemprop="datePublished" content="2021-11-06T18:06:11+08:00" />
+<meta itemprop="dateModified" content="2021-11-06T18:06:11+08:00" />
+<meta itemprop="wordCount" content="1457">
+<meta itemprop="keywords" content="Elasticsearch,数据库," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Elasticsearch的查询原理(下)"/>
+<meta name="twitter:description" content="多分片查询 es查询分为两个阶段&quot;query&quot;和&quot;fetch&quot;，称为&quot;query then fetch"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">文章</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">关于我</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">文章</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">关于我</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Elasticsearch的查询原理(下)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-11-06 </span>
+        <div class="post-category">
+            <a href="/categories/elasticsearch/"> Elasticsearch </a>
+            </div>
+          <span class="more-meta"> 约 1457 字 </span>
+          <span class="more-meta"> 预计阅读 3 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#多分片查询">多分片查询</a>
+          <ul>
+            <li><a href="#query阶段">query阶段</a></li>
+            <li><a href="#fetch阶段">fetch阶段</a></li>
+          </ul>
+        </li>
+        <li><a href="#search-after">search after</a></li>
+        <li><a href="#scroll-search">scroll search</a></li>
+        <li><a href="#结语">结语</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="多分片查询">多分片查询</h2>
+<p>es查询分为两个阶段&quot;query&quot;和&quot;fetch&quot;，称为&quot;query then fetch&quot;。
+<img src="/img/es-read-2/1.png" alt=""></p>
+<h3 id="query阶段">query阶段</h3>
+<ol>
+<li>客户端向node0发起了一次search请求，开始query阶段。</li>
+<li>node0从9个分片中随机选择3个分片，向这3个分片发起search请求，这3个分片需包含全部数据。</li>
+<li>这3个分片执行查询和排序，返回<code>from+size</code>个doc_id和排序值。</li>
+<li>node0对三个分片返回的数据进行排序整合，得到<code>from</code>到<code>from+size</code>的doc_id。</li>
+</ol>
+<h3 id="fetch阶段">fetch阶段</h3>
+<ol>
+<li>node0根据doc_id向相关的分片发生获取文档详情的请求。</li>
+<li>相关分片返回数据到node0。</li>
+<li>node0拼数据，返回给客户端。</li>
+</ol>
+<p>在es中，单分片query的效率是非常高的，但在多分片查询中，需要对来自多个分片的排序值执行排序，值的数量为<code>分片数*(from+size)</code>，分片数越多，<code>from+size</code>越大，查询效率越低。比如索引有500个分片，当需要展示第4900到第5000条的数据时，我们就需要对<code>250w(500*5000)</code>条数据进行第二次汇总排序，会占用非常多的系统资源，是具有&quot;深度分页&quot;的性能问题的。</p>
+<h2 id="search-after">search after</h2>
+<p>&ldquo;search after&quot;可以使用上一页的检索结果来检索下一页的数据，从而避免深度分页的问题。</p>
+<p>当前进行一次&quot;search after&quot;检索时，首先需要指定检索结果基于哪些字段进行排序，当进行完一次检索后，保存该次检索结果最后一条数据的排序字段，在进行下一页检索时将该值传入&quot;search_after&quot;参数中。</p>
+<p>进行search_after检索过程中，所有排序字段都需要有docValues索引且组合起来不能重复，进行翻页操作时，要保证筛选条件和排序条件不变；只可以进行&quot;下一页&quot;操作，不可以进行&quot;跳页&rdquo;；新版本es可以基于pit接口的索引快照进行查询。</p>
+<p>其实，search_after的查询，我们使用range query也可以实现，search_after本身也是这样做的。</p>
+<p>search_after其实是利用单分片query的高效率将from变为了0，大大减少了合并多分片排序值的数量。</p>
+<h2 id="scroll-search">scroll search</h2>
+<p>scroll可以来用完成遍历一个索引全部数据的需求，类似于传统数据库里的游标。</p>
+<p>其实scroll的原理与search after一致，只不过search_after将&quot;最后一条数据的排序值&quot;丢给了客户端，而scroll将其保存到了es的scroll上下文中。</p>
+<p>第一次创建scroll时，会将query、sort、size等字段保存至上下文中，同时做一个数据的当前时间快照，并返回一个scroll_id，之后客户端可以使用scroll_id进行数据的变量，并且在每次scroll的fetch阶段会刷新&quot;最后一条数据的排序值&quot;。</p>
+<p>在es的7.15的文档表示，不再推荐使用scroll api用于深度分页，推荐使用search after + pit 进行深度分页。这里是不推荐使用到实时交互的需求中，因为之前没有pit，导致search after不是那么好用，会有部分用户会用scroll代替search after。</p>
+<h2 id="结语">结语</h2>
+<p>Elasticsearch就到这里吧，以后遇到啥坑，再补充吧，现在实战中数据量小，也没啥坑能遇到(- . -)。立个大的flag，下一阶段坚持写完&quot;维度建模&quot;系列文章。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">libra</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-11-06
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/elasticsearch/">Elasticsearch</a>
+          <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/elasticsearch%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%8E%9F%E7%90%86%E4%B8%AD/">
+            <span class="next-text nav-default">Elasticsearch的查询原理(中)</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2021-11-06 18:06:11 \u002b0800 CST',
+        title: 'Elasticsearch的查询原理(下)',
+        clientID: '1a17cbb09ea46122583b',
+        clientSecret: 'ed0d1346838067fc47fd438c34a983eac9946ca8',
+        repo: 'blog-talk',
+        owner: 'longxiaofei',
+        admin: ['longxiaofei'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="libra.19951002@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/longxiaofei" class="iconfont icon-github" title="github"></a>
+  <a href="https://longxiaofei.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>libra</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c99b103c33d1539acf3025e1913697534542c4a5aa5af0ccc20475ed2863603b.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
