@@ -19,7 +19,7 @@ tags: ["Elasticsearch", "数据库"]
 
 ## Lucene的重要的索引结构
 * Inverted Index: 倒排索引，用于字符串等数据的索引。
-* BKD-Tree: 顺序存储，类似于B树，用于数值、日志、经纬度等数据的索引。
+* BKD-Tree: 顺序存储，类似于B树，用于数值、日期、经纬度等数据的索引。
 * DocValues: 正排索引, 列式存储。
 * Store: 文档原始数据内容。
 
