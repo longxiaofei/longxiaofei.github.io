@@ -166,3 +166,10 @@ tags: ["Elasticsearch", "数据库"]
 
   BKD树、索引范围查询、检索结果排序，将在下一篇写。
 
+## 参考
+* [关于Lucene的词典FST深入剖析](https://www.shenyanchao.cn/blog/2018/12/04/lucene-fst/)
+* [FST论文](https://cs.nyu.edu/~mohri/pub/fla.pdf)
+* [交集源码地址](https://github.com/apache/lucene/blob/5e0e7a5479bca798ccfe385629a0ca2ba5870bc0/lucene/core/src/java/org/apache/lucene/search/ConjunctionDISI.java)
+* [并集源码地址](https://github.com/apache/lucene/blob/d5d6dc079395c47cd6d12dcce3bcfdd2c7d9dc63/lucene/core/src/java/org/apache/lucene/search/DisjunctionScorer.java)
+* [差集源码地址](https://github.com/apache/lucene/blob/d5d6dc079395c47cd6d12dcce3bcfdd2c7d9dc63/lucene/core/src/java/org/apache/lucene/search/ReqExclScorer.java)
+
