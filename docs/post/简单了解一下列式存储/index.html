@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>简单了解一下列式存储 - libra blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="libra" /><meta name="description" content="就当抄书了，还是不好好抄书的那种。 什么是列式存储? 在我们经常接触的OLTP数据库(如Mysql、Mongodb)，大多是使用行结构进行存储数" /><meta name="keywords" content="libra, longxiaofei, douding, blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.88.1 with theme even" />
+
+
+<link rel="canonical" href="https://longxiaofei.github.io/post/%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3%E4%B8%80%E4%B8%8B%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.f92fd13721ddf72129410fd8250e73152cc6f2438082b6c0208dc24ee7c13fc4.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="简单了解一下列式存储" />
+<meta property="og:description" content="就当抄书了，还是不好好抄书的那种。 什么是列式存储? 在我们经常接触的OLTP数据库(如Mysql、Mongodb)，大多是使用行结构进行存储数" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://longxiaofei.github.io/post/%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3%E4%B8%80%E4%B8%8B%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-03-22T15:36:13+08:00" />
+<meta property="article:modified_time" content="2022-03-22T15:36:13+08:00" />
+
+<meta itemprop="name" content="简单了解一下列式存储">
+<meta itemprop="description" content="就当抄书了，还是不好好抄书的那种。 什么是列式存储? 在我们经常接触的OLTP数据库(如Mysql、Mongodb)，大多是使用行结构进行存储数"><meta itemprop="datePublished" content="2022-03-22T15:36:13+08:00" />
+<meta itemprop="dateModified" content="2022-03-22T15:36:13+08:00" />
+<meta itemprop="wordCount" content="1421">
+<meta itemprop="keywords" content="数据库,数据存储," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="简单了解一下列式存储"/>
+<meta name="twitter:description" content="就当抄书了，还是不好好抄书的那种。 什么是列式存储? 在我们经常接触的OLTP数据库(如Mysql、Mongodb)，大多是使用行结构进行存储数"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">文章</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">关于我</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">文章</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">关于我</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">简单了解一下列式存储</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-03-22 </span>
+        <div class="post-category">
+            <a href="/categories/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/"> 数据存储 </a>
+            </div>
+          <span class="more-meta"> 约 1421 字 </span>
+          <span class="more-meta"> 预计阅读 3 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#什么是列式存储">什么是列式存储?</a></li>
+        <li><a href="#列压缩">列压缩</a></li>
+        <li><a href="#列存储的排序">列存储的排序</a></li>
+        <li><a href="#列存储的写操作">列存储的写操作</a></li>
+        <li><a href="#结语">结语</a></li>
+        <li><a href="#引用抄">引用（抄）</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <blockquote>
+<p>就当抄书了，还是不好好抄书的那种。</p>
+</blockquote>
+<h2 id="什么是列式存储">什么是列式存储?</h2>
+<p>在我们经常接触的OLTP数据库(如Mysql、Mongodb)，大多是使用行结构进行存储数据的，当我们需要查询数据表中某些实体的数据时，我们可以通过一次索引就可以找到这个实体所有相关的数据，因为这个实体的数据都被存储在一行中的，这在OLTP的业务中是很顺其自然的一件事情。</p>
+<p><img src="/img/column-store/0.png" alt=""></p>
+<p>基于如上订单表，order_id为该表的主键，使用Mysql存储，当完成&quot;查询order_id为127的订单的所有数据&quot;需求时, 数据库可以直接在聚集索引中直接拿到该订单所有字段的数据。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+</span><span class="w">    </span><span class="o">*</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">    </span><span class="k">order</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">    </span><span class="n">order_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">127</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>但我们需要完成&quot;统计在2021年1月1日各个产品的总销售额和总销售量是多少&quot;时，假设&quot;dt是二级索引&quot;，我们通过dt的二级索引找到对应的聚集索引，但由于数据是使用行结构去存储的，我们需要将一行行数据全部从磁盘中拷贝到内存中，再从这些字段过滤出我们需要的字段去进行聚合操作。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+</span><span class="w">    </span><span class="n">product_id</span><span class="p">,</span><span class="w">
+</span><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">pay_fee</span><span class="p">)</span><span class="w"> </span><span class="n">sum_pay_fee</span><span class="p">,</span><span class="w">
+</span><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="n">sum_num</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">    </span><span class="k">order</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">    </span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&#34;2021-01-01&#34;</span><span class="w">
+</span><span class="w"></span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w">
+</span><span class="w">    </span><span class="n">product_id</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>列式存储，不同于行存储将一行中的数据存储在一起，列存储将属于同一列的所有值存在一起，每一列的值分别存为不同的文件，当我们进行查询和聚合时只需要根据需求，去往不同的列文件去读取对应列的数据，可以大大减少拷贝的数据量，加快数据读取的过程。</p>
+<p>基于列式存储的文件</p>
+<ul>
+<li>order_id: (127,128,129,130,131,132,&hellip;,29343123)</li>
+<li>product_id: (12,12,13,27,36,12,&hellip;,190)</li>
+<li>pay_fee: (120,60,230,3100,3000,180,&hellip;,3200)</li>
+<li>num: (2,1,1,2,6,3,&hellip;,10)</li>
+<li>dt: (2021-01-01,2021-01-01,2021-01-01,2021-01-01,2021-01-01,2021-01-01,&hellip;,2021-04-09)</li>
+</ul>
+<h2 id="列压缩">列压缩</h2>
+<p>除了通过仅加载需求所需列来减少磁盘的吞吐量外，还可以通过对数据进行压缩来达到相同的目的，列式存储非常适合进行数据压缩。以下介绍的是 C-Store 中的数据编码方式。</p>
+<p>我们根据两点来决定，数据适合使用什么样的编码方式。</p>
+<ul>
+<li>数据排序是否有序</li>
+<li>数据中有多少不同的取值</li>
+</ul>
+<p>以下为四种不同的情况。</p>
+<ol>
+<li>有序且不同值少。可以使用三元组<code>(v,f,n)</code>对数据编码，表示数值v从f行出现，一共有n个。例如(1,1,1,1,2,2,2,3,4,4,4)，可以表示为((1,1,4),(2,5,3),(3,8,1),(4,9,3))。</li>
+<li>有序且不同值多。可以把每个数值表示为前一个数值加上一个变化量。 例如(1,8,13,14,29,30)，可以表示为(1,7,5,1,15,1)。</li>
+<li>无序且不同值少。可以对每一个取值构造一个位图索引。例如上表中product_id列(12,12,13,27,36,12,&hellip;,190)，可以表示为(12, 110001&hellip;0),(13, 001000&hellip;0),(27, 000100&hellip;0),(36, 000010&hellip;0),(000000&hellip;1)。</li>
+<li>无序且不同值多。 对于这种方式没有很好的编码方式。</li>
+</ol>
+<p>编码之后，可以将数据进行压缩。由于一列中的数据本身具有相似性，即使不做特殊编码，也能取得很好的压缩效果。</p>
+<p>列压缩除了可以减少从磁盘中加载的数据量，还有利于高效运用cpu周期，当我们列进行压缩后，我们甚至可以将一大块压缩的列数据放入CPU L1级缓存，进行紧凑地快速迭代计算。</p>
+<h2 id="列存储的排序">列存储的排序</h2>
+<p>单独排序每列数据是没有意义的，会导致多个列文件的数据顺序不一致，多个列文件根据行顺序决定多个列是否属于同一行。</p>
+<h2 id="列存储的写操作">列存储的写操作</h2>
+<p>使用B-Tree进行原地更新的方式是不可能的，大多数OLAP数据库、搜索引擎，都是采用LSM-Tree类似的方式，先写入内存，在内存中累积一定的写入数据，落磁盘，与旧的磁盘文件合并，生成新的磁盘文件，删除旧的文件。只能追加式更新文件，已经生成的磁盘文件不会被修改，只能被合并后完全被删除。</p>
+<h2 id="结语">结语</h2>
+<p>最近好闲呀。</p>
+<h2 id="引用抄">引用（抄）</h2>
+<ul>
+<li><a href="https://book.douban.com/subject/30329536/">数据密集型应用系统设计</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/35622907">处理海量数据：列式存储综述（存储篇）</a></li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">libra</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2022-03-22
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>
+          <a href="/tags/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/">数据存储</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/%E9%9A%8F%E4%BE%BF%E5%86%99%E5%86%99/">
+            <span class="next-text nav-default">随便写写</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2022-03-22 15:36:13 \u002b0800 CST',
+        title: '简单了解一下列式存储',
+        clientID: '1a17cbb09ea46122583b',
+        clientSecret: 'ed0d1346838067fc47fd438c34a983eac9946ca8',
+        repo: 'blog-talk',
+        owner: 'longxiaofei',
+        admin: ['longxiaofei'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="libra.19951002@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/longxiaofei" class="iconfont icon-github" title="github"></a>
+  <a href="https://longxiaofei.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2021 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>libra</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c99b103c33d1539acf3025e1913697534542c4a5aa5af0ccc20475ed2863603b.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
