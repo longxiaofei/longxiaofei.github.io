@@ -3,28 +3,56 @@
   
   <url>
     <loc>https://longxiaofei.github.io/categories/</loc>
-    <lastmod>2022-03-22T15:36:13+08:00</lastmod>
+    <lastmod>2022-03-23T22:42:49+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://longxiaofei.github.io/</loc>
-    <lastmod>2022-03-22T15:36:13+08:00</lastmod>
+    <lastmod>2022-03-23T22:42:49+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/post/mapreduce%E6%B5%81%E7%A8%8B/</loc>
+    <lastmod>2022-03-23T22:42:49+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://longxiaofei.github.io/post/</loc>
-    <lastmod>2022-03-22T15:36:13+08:00</lastmod>
+    <lastmod>2022-03-23T22:42:49+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://longxiaofei.github.io/tags/</loc>
-    <lastmod>2022-03-22T15:36:13+08:00</lastmod>
+    <lastmod>2022-03-23T22:42:49+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/</loc>
+    <lastmod>2022-03-23T22:42:49+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/tags/%E6%89%B9%E8%AE%A1%E7%AE%97/</loc>
+    <lastmod>2022-03-23T22:42:49+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://longxiaofei.github.io/categories/%E6%89%B9%E8%AE%A1%E7%AE%97/</loc>
+    <lastmod>2022-03-23T22:42:49+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
