@@ -6,22 +6,31 @@
     <description>Recent content in Tags on libra blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 23 Mar 2022 22:42:49 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 29 Mar 2022 21:16:31 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>spark</title>
+      <link>https://longxiaofei.github.io/tags/spark/</link>
+      <pubDate>Tue, 29 Mar 2022 21:16:31 +0800</pubDate>
+      
+      <guid>https://longxiaofei.github.io/tags/spark/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>大数据</title>
       <link>https://longxiaofei.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/</link>
-      <pubDate>Wed, 23 Mar 2022 22:42:49 +0800</pubDate>
+      <pubDate>Tue, 29 Mar 2022 21:16:31 +0800</pubDate>
       
       <guid>https://longxiaofei.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>批计算</title>
-      <link>https://longxiaofei.github.io/tags/%E6%89%B9%E8%AE%A1%E7%AE%97/</link>
+      <title>mapreduce</title>
+      <link>https://longxiaofei.github.io/tags/mapreduce/</link>
       <pubDate>Wed, 23 Mar 2022 22:42:49 +0800</pubDate>
       
-      <guid>https://longxiaofei.github.io/tags/%E6%89%B9%E8%AE%A1%E7%AE%97/</guid>
+      <guid>https://longxiaofei.github.io/tags/mapreduce/</guid>
       <description></description>
     </item>
     

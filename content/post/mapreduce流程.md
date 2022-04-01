@@ -2,8 +2,8 @@
 title: "Mapreduce流程"
 date: 2022-03-23T22:42:49+08:00
 draft: false
-categories: ["批计算"]
-tags: ["大数据", "批计算"]
+categories: ["mapreduce"]
+tags: ["大数据", "mapreduce"]
 ---
 
 ![](/img/mapreduce/mapreduce.png)
