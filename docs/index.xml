@@ -6,7 +6,16 @@
     <description>Recent content on libra blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 01 Apr 2022 19:19:29 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 13 Apr 2022 17:54:05 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Spark数据倾斜的解决方案</title>
+      <link>https://longxiaofei.github.io/post/spark%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</link>
+      <pubDate>Wed, 13 Apr 2022 17:54:05 +0800</pubDate>
+      
+      <guid>https://longxiaofei.github.io/post/spark%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</guid>
+      <description>抄 方案 提高reduce task的个数(添加分区数) 适用场景: key分布不均 思路: 添加reduce task的个数 原理: 分区数增大，可以让每个t</description>
+    </item>
+    
     <item>
       <title>Spark Shuffle流程</title>
       <link>https://longxiaofei.github.io/post/spark-shuffle%E6%B5%81%E7%A8%8B/</link>
@@ -94,7 +103,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://longxiaofei.github.io/about/</guid>
-      <description>关于我 Pythonista, 全栈工程师(什么都会点皮毛), 半吊子数据工程师 社恐症患者, 曾今的中二少年, 迷茫的社会青年 山东汉子, 在北京待了三年, 现定居杭州 之前在V</description>
+      <description>关于我 Pythonista, 全栈工程师(什么都会点皮毛), 数据工程师 社恐症患者, 曾今的中二少年, 迷茫的社会青年 山东汉子, 在北京待了三年, 现定居杭州 现在在混日子和</description>
     </item>
     
   </channel>
