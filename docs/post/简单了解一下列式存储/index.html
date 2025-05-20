@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.88.1 with theme even" />
+<meta name="generator" content="Hugo 0.83.0 with theme even" />
 
 
 <link rel="canonical" href="https://longxiaofei.github.io/post/%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3%E4%B8%80%E4%B8%8B%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8/" />
@@ -43,12 +43,12 @@
 <meta property="og:description" content="就当抄书了，还是不好好抄书的那种。 什么是列式存储? 在我们经常接触的OLTP数据库(如Mysql、Mongodb)，大多是使用行结构进行存储数" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://longxiaofei.github.io/post/%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3%E4%B8%80%E4%B8%8B%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2022-03-22T15:36:13+08:00" />
-<meta property="article:modified_time" content="2022-03-22T15:36:13+08:00" />
+<meta property="article:published_time" content="2022-03-22T15:36:13&#43;08:00" />
+<meta property="article:modified_time" content="2022-03-22T15:36:13&#43;08:00" />
 
 <meta itemprop="name" content="简单了解一下列式存储">
-<meta itemprop="description" content="就当抄书了，还是不好好抄书的那种。 什么是列式存储? 在我们经常接触的OLTP数据库(如Mysql、Mongodb)，大多是使用行结构进行存储数"><meta itemprop="datePublished" content="2022-03-22T15:36:13+08:00" />
-<meta itemprop="dateModified" content="2022-03-22T15:36:13+08:00" />
+<meta itemprop="description" content="就当抄书了，还是不好好抄书的那种。 什么是列式存储? 在我们经常接触的OLTP数据库(如Mysql、Mongodb)，大多是使用行结构进行存储数"><meta itemprop="datePublished" content="2022-03-22T15:36:13&#43;08:00" />
+<meta itemprop="dateModified" content="2022-03-22T15:36:13&#43;08:00" />
 <meta itemprop="wordCount" content="1421">
 <meta itemprop="keywords" content="数据库,数据存储," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="简单了解一下列式存储"/>
@@ -89,21 +89,12 @@
         <li class="mobile-menu-item">关于我</li>
       </a>
   </ul>
-
-  
-
-
 </nav>
-
   <div class="container" id="mobile-panel">
     <header id="header" class="header">
         <div class="logo-wrapper">
   <a href="/" class="logo">blog</a>
 </div>
-
-
-
-
 
 <nav class="site-navbar">
   <ul id="menu" class="menu">
@@ -120,7 +111,6 @@
       </li>
   </ul>
 </nav>
-
     </header>
 
     <main id="main" class="main">
@@ -171,7 +161,7 @@
 <p>基于如上订单表，order_id为该表的主键，使用Mysql存储，当完成&quot;查询order_id为127的订单的所有数据&quot;需求时, 数据库可以直接在聚集索引中直接拿到该订单所有字段的数据。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -179,7 +169,7 @@
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
 </span><span class="w">    </span><span class="o">*</span><span class="w">
 </span><span class="w"></span><span class="k">FROM</span><span class="w">
 </span><span class="w">    </span><span class="k">order</span><span class="w">
@@ -190,7 +180,7 @@
 </div><p>但我们需要完成&quot;统计在2021年1月1日各个产品的总销售额和总销售量是多少&quot;时，假设&quot;dt是二级索引&quot;，我们通过dt的二级索引找到对应的聚集索引，但由于数据是使用行结构去存储的，我们需要将一行行数据全部从磁盘中拷贝到内存中，再从这些字段过滤出我们需要的字段去进行聚合操作。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -202,7 +192,7 @@
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
 </span><span class="w">    </span><span class="n">product_id</span><span class="p">,</span><span class="w">
 </span><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">pay_fee</span><span class="p">)</span><span class="w"> </span><span class="n">sum_pay_fee</span><span class="p">,</span><span class="w">
 </span><span class="w">    </span><span class="k">SUM</span><span class="p">(</span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="n">sum_num</span><span class="w">
@@ -339,7 +329,7 @@
   <span class="copyright-year">
     &copy; 
     2021 - 
-    2024<span class="heart"><i class="iconfont icon-heart"></i></span><span>libra</span>
+    2025<span class="heart"><i class="iconfont icon-heart"></i></span><span>libra</span>
   </span>
 </div>
 

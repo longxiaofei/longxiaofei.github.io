@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.88.1 with theme even" />
+<meta name="generator" content="Hugo 0.83.0 with theme even" />
 
 
 <link rel="canonical" href="https://longxiaofei.github.io/post/spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/" />
@@ -43,12 +43,12 @@
 <meta property="og:description" content="运行架构 上图是在spark官方上找的图，这里我们只说上面几个块块是做什么用的。 Driver Program，为Spark的驱动程序，其实就是一个spar" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://longxiaofei.github.io/post/spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2022-03-29T21:16:31+08:00" />
-<meta property="article:modified_time" content="2022-03-29T21:16:31+08:00" />
+<meta property="article:published_time" content="2022-03-29T21:16:31&#43;08:00" />
+<meta property="article:modified_time" content="2022-03-29T21:16:31&#43;08:00" />
 
 <meta itemprop="name" content="Spark运行架构">
-<meta itemprop="description" content="运行架构 上图是在spark官方上找的图，这里我们只说上面几个块块是做什么用的。 Driver Program，为Spark的驱动程序，其实就是一个spar"><meta itemprop="datePublished" content="2022-03-29T21:16:31+08:00" />
-<meta itemprop="dateModified" content="2022-03-29T21:16:31+08:00" />
+<meta itemprop="description" content="运行架构 上图是在spark官方上找的图，这里我们只说上面几个块块是做什么用的。 Driver Program，为Spark的驱动程序，其实就是一个spar"><meta itemprop="datePublished" content="2022-03-29T21:16:31&#43;08:00" />
+<meta itemprop="dateModified" content="2022-03-29T21:16:31&#43;08:00" />
 <meta itemprop="wordCount" content="2324">
 <meta itemprop="keywords" content="大数据,spark," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Spark运行架构"/>
@@ -89,21 +89,12 @@
         <li class="mobile-menu-item">关于我</li>
       </a>
   </ul>
-
-  
-
-
 </nav>
-
   <div class="container" id="mobile-panel">
     <header id="header" class="header">
         <div class="logo-wrapper">
   <a href="/" class="logo">blog</a>
 </div>
-
-
-
-
 
 <nav class="site-navbar">
   <ul id="menu" class="menu">
@@ -120,7 +111,6 @@
       </li>
   </ul>
 </nav>
-
     </header>
 
     <main id="main" class="main">
@@ -211,7 +201,7 @@
 <p>来举一个具体的例子，代码如下。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -230,7 +220,7 @@
 </span><span class="lnt">17
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">data1</span> <span class="k">=</span> <span class="nc">Array</span><span class="o">[(</span><span class="kt">Int</span>, <span class="kt">String</span><span class="o">)]((</span><span class="mi">1</span><span class="o">,</span> <span class="s">&#34;a&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&#34;b&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&#34;c&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">&#34;a&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">&#34;h&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&#34;g&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&#34;l&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&#34;x&#34;</span><span class="o">))</span>
+<pre class="chroma"><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">data1</span> <span class="k">=</span> <span class="nc">Array</span><span class="o">[(</span><span class="kt">Int</span>, <span class="kt">String</span><span class="o">)]((</span><span class="mi">1</span><span class="o">,</span> <span class="s">&#34;a&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&#34;b&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&#34;c&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">&#34;a&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">&#34;h&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&#34;g&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&#34;l&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&#34;x&#34;</span><span class="o">))</span>
 <span class="k">val</span> <span class="n">data2</span> <span class="k">=</span> <span class="nc">Array</span><span class="o">[(</span><span class="kt">Int</span>, <span class="kt">String</span><span class="o">)]((</span><span class="mi">1</span><span class="o">,</span> <span class="s">&#34;A&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&#34;B&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&#34;C&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">&#34;L&#34;</span><span class="o">))</span>
 <span class="k">val</span> <span class="n">data3</span> <span class="k">=</span> <span class="nc">Array</span><span class="o">[(</span><span class="kt">Int</span>, <span class="kt">String</span><span class="o">)]((</span><span class="mi">3</span><span class="o">,</span> <span class="s">&#34;G&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">&#34;A&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&#34;Z&#34;</span><span class="o">),</span> <span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">&#34;A&#34;</span><span class="o">))</span>
 
@@ -367,7 +357,7 @@
   <span class="copyright-year">
     &copy; 
     2021 - 
-    2024<span class="heart"><i class="iconfont icon-heart"></i></span><span>libra</span>
+    2025<span class="heart"><i class="iconfont icon-heart"></i></span><span>libra</span>
   </span>
 </div>
 
