@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Postgresql索引失效(1) - libra blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="libra" /><meta name="description" content="案例一：批量删除历史数据导致索引失效的问题 表结构 1 2 3 4 5 6 7 8 createtableexample0(iduuidnotnullprimarykey,other_columntextnotnull,created_attimestampwithtimezone);createindexidx_example0_created_atonexample0(created_at); 业务背景 表example1大概存储了五年的数据，大概有5亿条数据。 表没有做" /><meta name="keywords" content="libra, longxiaofei, douding, blog" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.83.0 with theme even" />
+
+
+<link rel="canonical" href="https://longxiaofei.github.io/post/postgresql%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%881/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.f92fd13721ddf72129410fd8250e73152cc6f2438082b6c0208dc24ee7c13fc4.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Postgresql索引失效(1)" />
+<meta property="og:description" content="案例一：批量删除历史数据导致索引失效的问题 表结构 1 2 3 4 5 6 7 8 createtableexample0(iduuidnotnullprimarykey,other_columntextnotnull,created_attimestampwithtimezone);createindexidx_example0_created_atonexample0(created_at); 业务背景 表example1大概存储了五年的数据，大概有5亿条数据。 表没有做" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://longxiaofei.github.io/post/postgresql%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%881/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2025-08-25T20:00:14&#43;08:00" />
+<meta property="article:modified_time" content="2025-08-25T20:00:14&#43;08:00" />
+
+<meta itemprop="name" content="Postgresql索引失效(1)">
+<meta itemprop="description" content="案例一：批量删除历史数据导致索引失效的问题 表结构 1 2 3 4 5 6 7 8 createtableexample0(iduuidnotnullprimarykey,other_columntextnotnull,created_attimestampwithtimezone);createindexidx_example0_created_atonexample0(created_at); 业务背景 表example1大概存储了五年的数据，大概有5亿条数据。 表没有做"><meta itemprop="datePublished" content="2025-08-25T20:00:14&#43;08:00" />
+<meta itemprop="dateModified" content="2025-08-25T20:00:14&#43;08:00" />
+<meta itemprop="wordCount" content="2609">
+<meta itemprop="keywords" content="Postgresql,数据库," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Postgresql索引失效(1)"/>
+<meta name="twitter:description" content="案例一：批量删除历史数据导致索引失效的问题 表结构 1 2 3 4 5 6 7 8 createtableexample0(iduuidnotnullprimarykey,other_columntextnotnull,created_attimestampwithtimezone);createindexidx_example0_created_atonexample0(created_at); 业务背景 表example1大概存储了五年的数据，大概有5亿条数据。 表没有做"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">文章</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">关于我</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">blog</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">文章</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">关于我</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Postgresql索引失效(1)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2025-08-25 </span>
+        <div class="post-category">
+            <a href="/categories/postgresql/"> Postgresql </a>
+            </div>
+          <span class="more-meta"> 约 2609 字 </span>
+          <span class="more-meta"> 预计阅读 6 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#案例一批量删除历史数据导致索引失效的问题">案例一：批量删除历史数据导致索引失效的问题</a>
+          <ul>
+            <li><a href="#表结构">表结构</a></li>
+            <li><a href="#业务背景">业务背景</a></li>
+            <li><a href="#问题复现和分析">问题复现和分析</a></li>
+            <li><a href="#解决方案">解决方案</a></li>
+          </ul>
+        </li>
+        <li><a href="#案例二-索引未命中导致查询性能问题">案例二: 索引未命中导致查询性能问题</a>
+          <ul>
+            <li><a href="#表结构-1">表结构</a></li>
+            <li><a href="#业务背景-1">业务背景</a></li>
+            <li><a href="#问题复现和分析-1">问题复现和分析</a></li>
+            <li><a href="#解决方案-1">解决方案</a></li>
+          </ul>
+        </li>
+        <li><a href="#案例三统计信息不准确导致索引选择异常">案例三：统计信息不准确导致索引选择异常</a>
+          <ul>
+            <li><a href="#表结构-2">表结构</a></li>
+            <li><a href="#业务背景-2">业务背景</a></li>
+            <li><a href="#问题复现和分析-2">问题复现和分析</a></li>
+            <li><a href="#解决方案-2">解决方案</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="案例一批量删除历史数据导致索引失效的问题">案例一：批量删除历史数据导致索引失效的问题</h2>
+<h3 id="表结构">表结构</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">example0</span><span class="w">
+</span><span class="w"></span><span class="p">(</span><span class="w">
+</span><span class="w">   </span><span class="n">id</span><span class="w">                                       </span><span class="n">uuid</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="p">,</span><span class="w">
+</span><span class="w">   </span><span class="n">other_column</span><span class="w">                             </span><span class="nb">text</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span><span class="w">   </span><span class="n">created_at</span><span class="w">                               </span><span class="k">timestamp</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="k">zone</span><span class="w">
+</span><span class="w"></span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_example0_created_at</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">example0</span><span class="w"> </span><span class="p">(</span><span class="n">created_at</span><span class="p">);</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="业务背景">业务背景</h3>
+<ul>
+<li>表example1大概存储了五年的数据，大概有5亿条数据。</li>
+<li>表没有做时间分区，所以数据都在同一张表中。</li>
+<li>由于磁盘成本的压力，业务要求仅保留最近两年的数据</li>
+<li>方案为<code>批量删除历史数据 + pgrepack重整表结构</code></li>
+</ul>
+<h3 id="问题复现和分析">问题复现和分析</h3>
+<p>清理流程如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="c1">-- step 1
+</span><span class="c1"></span><span class="k">SELECT</span><span class="w">
+</span><span class="w">   </span><span class="n">id</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">example0</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">   </span><span class="n">created_at</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="s1">&#39;2023-08-25&#39;</span><span class="w">
+</span><span class="w"></span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w">
+</span><span class="w">   </span><span class="n">created_at</span><span class="w"> </span><span class="k">ASC</span><span class="w">
+</span><span class="w"></span><span class="k">LIMIT</span><span class="w">
+</span><span class="w">   </span><span class="mi">500</span><span class="p">;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c1">-- step 2
+</span><span class="c1"></span><span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">example0</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">   </span><span class="n">id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="n">step_1_ids</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c1">-- step 3
+</span><span class="c1"></span><span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">example0_relation_table</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">   </span><span class="n">example0_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="n">step_1_ids</span><span class="p">)</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>整体逻辑:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">while true:
+   每次从example0表捞出最老的500条数据。
+   删除与这500条数据相关的数据。
+</code></pre></td></tr></table>
+</div>
+</div><p>预期的执行逻辑:</p>
+<p>由于存在 idx_example0_created_at 索引，预期情况是每次根据 created_at 从头扫描，找到 500 条后立即返回。随着数据逐步删除，下一次继续从索引的头部扫描，仍然只需扫描少量数据。</p>
+<p>实际的执行逻辑:</p>
+<ul>
+<li>
+<p>PostgreSQL 删除记录时，仅仅标记对应的 表记录和索引项为已删除，并不会立即回收空间。</p>
+</li>
+<li>
+<p>只有在执行 VACUUM 后，标记删除的数据才会被彻底清理。</p>
+</li>
+<li>
+<p>如果未及时执行 VACUUM，这些“已删除”的索引项仍会参与扫描，导致 step_1 每次都要遍历越来越多的无效索引项。</p>
+</li>
+<li>
+<p>由于表体量很大，且未调整 autovacuum 参数，长时间未触发自动 VACUUM。</p>
+</li>
+<li>
+<p>当删除量达到 100 万条时，step_1 查询明显变慢，因为每次扫描都需要跳过大量无效索引项。</p>
+</li>
+</ul>
+<p>最终表现：<strong>批量删除越多，查询性能越差</strong>。</p>
+<h3 id="解决方案">解决方案</h3>
+<p>核心思路: <strong>避免重复扫描已经删除的旧数据</strong>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+</span><span class="w">   </span><span class="n">id</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">example0</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">   </span><span class="n">created_at</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="o">`&lt;</span><span class="n">previous_step_last_created_at</span><span class="o">&gt;`</span><span class="w">
+</span><span class="w">   </span><span class="n">created_at</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="s1">&#39;2023-08-25&#39;</span><span class="w">
+</span><span class="w"></span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w">
+</span><span class="w">   </span><span class="n">created_at</span><span class="w"> </span><span class="k">ASC</span><span class="w">
+</span><span class="w"></span><span class="k">LIMIT</span><span class="w">
+</span><span class="w">   </span><span class="mi">500</span><span class="p">;</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>维护一个 previous_step_last_created_at 变量，表示上一次处理的最后一条记录的时间。</p>
+</li>
+<li>
+<p>每次循环后更新该值，下一次从该时间点继续扫描，而不是从头扫描。</p>
+</li>
+</ul>
+<h2 id="案例二-索引未命中导致查询性能问题">案例二: 索引未命中导致查询性能问题</h2>
+<h3 id="表结构-1">表结构</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">collection</span><span class="w">
+</span><span class="w"></span><span class="p">(</span><span class="w">
+</span><span class="w">   </span><span class="n">collection_id</span><span class="w">        </span><span class="nb">integer</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="err">，</span><span class="w">
+</span><span class="w">   </span><span class="n">entity_id</span><span class="w">            </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span><span class="w">   </span><span class="n">status</span><span class="w">               </span><span class="nb">text</span><span class="err">，</span><span class="w">
+</span><span class="w">   </span><span class="n">created_at</span><span class="w">           </span><span class="k">timestamp</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="k">zone</span><span class="p">,</span><span class="w">
+</span><span class="w">   </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="p">(</span><span class="n">collection_id</span><span class="p">,</span><span class="w"> </span><span class="n">entity_id</span><span class="p">)</span><span class="w">
+</span><span class="w"></span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_collection_collection_id_status</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">collection</span><span class="w"> </span><span class="p">(</span><span class="n">list_id</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">);</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="业务背景-1">业务背景</h3>
+<p>collection 表用于存储某类道具的集合，每个道具有两种状态：CREATED（未使用）和 USED（已使用）。
+当前业务场景需要实现一个逻辑：<strong>从指定的集合中随机取一个未使用的道具</strong>。</p>
+<h3 id="问题复现和分析-1">问题复现和分析</h3>
+<p>业务sql如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+</span><span class="w">   </span><span class="o">*</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">collection</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">   </span><span class="n">collection_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">113</span><span class="w"> </span><span class="k">AND</span><span class="w">
+</span><span class="w">   </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;CREATED&#39;</span><span class="w">
+</span><span class="w"></span><span class="k">LIMIT</span><span class="w">
+</span><span class="w">   </span><span class="mi">1</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>测试结果:</p>
+<ul>
+<li>
+<p><code>WHERE collection_id = 110 AND status = 'CREATED'</code>时会走<code>idx_collection_collection_id_status</code>索引，查询时间小于50ms</p>
+</li>
+<li>
+<p><code>WHERE collection_id = 113 AND status = 'CREATED'</code>时，却会执行顺序扫描，(query_ms &gt; 2s, 执行时间 &gt; 2 s，扫描行数超过 200 万。</p>
+</li>
+</ul>
+<p>先看一下collection_id分布情况:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+</span><span class="w">   </span><span class="n">collection_id</span><span class="p">,</span><span class="w">
+</span><span class="w">   </span><span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">count</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">collection</span><span class="w">
+</span><span class="w"></span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w">
+</span><span class="w">   </span><span class="n">collection_id</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><table>
+<thead>
+<tr>
+<th>collection_id</th>
+<th>count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>51</td>
+<td>10000</td>
+</tr>
+<tr>
+<td>57</td>
+<td>10000</td>
+</tr>
+<tr>
+<td>61</td>
+<td>200000</td>
+</tr>
+<tr>
+<td>94</td>
+<td>300000</td>
+</tr>
+<tr>
+<td>99</td>
+<td>500000</td>
+</tr>
+<tr>
+<td>110</td>
+<td>50000</td>
+</tr>
+<tr>
+<td>113</td>
+<td>3000000</td>
+</tr>
+<tr>
+<td>120</td>
+<td>100000</td>
+</tr>
+</tbody>
+</table>
+<p>再查看 collection_id 统计信息:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+</span><span class="w">   </span><span class="n">most_common_vals</span><span class="p">,</span><span class="w"> </span><span class="n">most_common_freqs</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">pg_stats</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">   </span><span class="n">tablename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;collection&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w">
+</span><span class="w">   </span><span class="n">attname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;collection_id&#39;</span><span class="p">;</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><table>
+<thead>
+<tr>
+<th>most_common_vals</th>
+<th>most_common_freqs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[113, &hellip;&hellip;]</td>
+<td>[0.68234, &hellip;&hellip;]</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，collection_id = 113 的数据占比超过 68%，即该值在整个表中非常倾斜（skewed）。
+PostgreSQL 的查询优化器会基于统计信息进行成本估算，认为对于高频值，顺序扫描比索引扫描更划算，因此放弃了索引。</p>
+<p>这类问题本质是<strong>数据分布倾斜 + 成本估算策略</strong>导致的。</p>
+<h3 id="解决方案-1">解决方案</h3>
+<p>核心思路:</p>
+<ul>
+<li><strong>利用 ORDER BY 对成本计算的影响，迫使优化器选择索引扫描</strong>。</li>
+<li>引入一个辅助列 rank_number，为每条记录生成一个随机数。</li>
+<li>新建包含 rank_number 的索引，并通过 ORDER BY rank_number 优化查询。</li>
+</ul>
+<p>新的表结构:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">collection</span><span class="w">
+</span><span class="w"></span><span class="p">(</span><span class="w">
+</span><span class="w">   </span><span class="n">collection_id</span><span class="w">         </span><span class="nb">integer</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="err">，</span><span class="w">
+</span><span class="w">   </span><span class="n">entity_id</span><span class="w">             </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span><span class="w">   </span><span class="n">status</span><span class="w">                </span><span class="nb">text</span><span class="err">，</span><span class="w">
+</span><span class="w">   </span><span class="n">created_at</span><span class="w">            </span><span class="k">timestamp</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="k">zone</span><span class="p">,</span><span class="w">
+</span><span class="w">   </span><span class="n">rank_number</span><span class="w">           </span><span class="nb">integer</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">,</span><span class="w">
+</span><span class="w">   </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="p">(</span><span class="n">collection_id</span><span class="p">,</span><span class="w"> </span><span class="n">entity_id</span><span class="p">)</span><span class="w">
+</span><span class="w"></span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_collection_collection_id_status_rank_number</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">collection</span><span class="w"> </span><span class="p">(</span><span class="n">list_id</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="n">rank_number</span><span class="p">);</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>优化后的查询sql:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+</span><span class="w">   </span><span class="o">*</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">collection</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">   </span><span class="n">collection_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">113</span><span class="w"> </span><span class="k">AND</span><span class="w">
+</span><span class="w">   </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;CREATED&#39;</span><span class="w">
+</span><span class="w"></span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w">
+</span><span class="w">   </span><span class="n">rank_number</span><span class="w">
+</span><span class="w"></span><span class="k">LIMIT</span><span class="w">
+</span><span class="w">   </span><span class="mi">1</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>由于引入了 ORDER BY rank_number，优化器倾向使用索引扫描（因为排序成本在顺序扫描下非常高），从而避免全表扫描。</p>
+<p>对于特定状态（如 CREATED），可以使用 部分索引（Partial Index），进一步减少索引体积：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w">
+</span><span class="w">   </span><span class="n">idx_collection_collection_id_status_rank_number_where_status_created</span><span class="w">
+</span><span class="w"></span><span class="k">on</span><span class="w"> </span><span class="n">collection</span><span class="w">
+</span><span class="w">   </span><span class="p">(</span><span class="n">list_id</span><span class="p">,</span><span class="w"> </span><span class="n">rank_number</span><span class="p">)</span><span class="w">
+</span><span class="w"></span><span class="k">where</span><span class="w">
+</span><span class="w">   </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;CREATED&#39;</span><span class="p">;</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="案例三统计信息不准确导致索引选择异常">案例三：统计信息不准确导致索引选择异常</h2>
+<h3 id="表结构-2">表结构</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">meeting_books</span><span class="w">
+</span><span class="w"></span><span class="p">(</span><span class="w">
+</span><span class="w">    </span><span class="n">book_id</span><span class="w">              </span><span class="nb">integer</span><span class="w"> </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="p">,</span><span class="w">
+</span><span class="w">    </span><span class="n">user_id</span><span class="w">              </span><span class="nb">text</span><span class="p">,</span><span class="w">
+</span><span class="w">    </span><span class="n">meeting_id</span><span class="w">           </span><span class="nb">text</span><span class="p">,</span><span class="w">
+</span><span class="w">    </span><span class="n">created_at</span><span class="w">           </span><span class="k">timestamp</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="k">zone</span><span class="p">,</span><span class="w">
+</span><span class="w"></span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">create</span><span class="w"> </span><span class="k">unique</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_meeting_books_user_id_meeting_id</span><span class="w">
+</span><span class="w">    </span><span class="k">on</span><span class="w"> </span><span class="n">meeting_books</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">meeting_id</span><span class="p">);</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_meeting_books_meeting_id_created_at</span><span class="w">
+</span><span class="w">    </span><span class="k">on</span><span class="w"> </span><span class="n">meeting_books</span><span class="w"> </span><span class="p">(</span><span class="n">meeting_id</span><span class="p">,</span><span class="w"> </span><span class="n">created_at</span><span class="p">);</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="业务背景-2">业务背景</h3>
+<p>meeting_books 表记录了某个会议中给用户发放的书籍信息。
+当前业务场景：查询某个用户在特定会议中领取的书籍。</p>
+<h3 id="问题复现和分析-2">问题复现和分析</h3>
+<p>业务sql如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+</span><span class="w">   </span><span class="o">*</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">meeting_books</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">   </span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;abc&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">meeting_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;T&#39;</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>运行结果:</p>
+<ul>
+<li>
+<p>当 <code>WHERE user_id = 'abc' AND meeting_id = 'T'</code>, postgresql选择走<code>idx_meeting_books_meeting_id_created_at</code>索引，查询耗时大于1s，共扫描67W行数据。</p>
+</li>
+<li>
+<p>当 <code>WHERE user_id = 'abc' AND meeting_id = 'A'</code>, postgresql选择走<code>idx_meeting_books_user_id_meeting_id</code>索引，查询耗时小于50ms，共扫描20行数据。</p>
+</li>
+</ul>
+<p>直接来查看 meeting_id 统计信息:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span><span class="w">
+</span><span class="w">   </span><span class="n">most_common_vals</span><span class="p">,</span><span class="w"> </span><span class="n">most_common_freqs</span><span class="w">
+</span><span class="w"></span><span class="k">FROM</span><span class="w">
+</span><span class="w">   </span><span class="n">pg_stats</span><span class="w">
+</span><span class="w"></span><span class="k">WHERE</span><span class="w">
+</span><span class="w">   </span><span class="n">tablename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;meeting_books&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w">
+</span><span class="w">   </span><span class="n">attname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;meeting_id&#39;</span><span class="p">;</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><table>
+<thead>
+<tr>
+<th>most_common_vals</th>
+<th>most_common_freqs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[A, B, C, D, E, F, G]</td>
+<td>[0.21, 0.19, 0.18, 0.14, 0.12, 0.09, 0.07]</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到:</p>
+<ul>
+<li>most_common_vals 只记录了 前 7 个频率最高的值（默认最多 100 个）。</li>
+<li>这些频率加起来接近 1（100%），而 meeting_id = &lsquo;T&rsquo; 并未出现在统计数据中。</li>
+<li>PostgreSQL 在 代价估算 时，认为 meeting_id = &lsquo;T&rsquo; 是极低频值（甚至近似 0），导致 错误选择 idx_meeting_books_meeting_id_created_at。</li>
+</ul>
+<p>根因：
+<strong>统计信息未及时更新</strong>，导致优化器基于过时的分布信息做出错误的索引选择。</p>
+<h3 id="解决方案-2">解决方案</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">VACUUM</span><span class="w"> </span><span class="k">ANALYZE</span><span class="w"> </span><span class="n">meeting_books</span><span class="p">;</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>执行后，统计信息会包含 meeting_id = &lsquo;T&rsquo;，优化器重新选择合适的索引<code>idx_meeting_books_user_id_meeting_id</code>，查询性能恢复正常。</p>
+<p>其他优化思路:</p>
+<ul>
+<li>根据业务，在新的meeting举办后，且进行了一段时间后，手动analyze</li>
+<li>调整适合<code>autovacuum_analyze_threshold</code>和<code>autovacuum_analyze_scale_factor</code>。如果表特别大(&gt;1000W行),默认为(10%+50)=100W行数据发生改变，才会自动触发analyze，很容易出现新meeting的慢查询。</li>
+<li>定时在业务低峰期进行vacuum + analyze</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">libra</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2025-08-25
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/postgresql/">Postgresql</a>
+          <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/30%E4%BA%86/">
+            <span class="next-text nav-default">30了</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2025-08-25 20:00:14 \u002b0800 CST',
+        title: 'Postgresql索引失效(1)',
+        clientID: '1a17cbb09ea46122583b',
+        clientSecret: 'ed0d1346838067fc47fd438c34a983eac9946ca8',
+        repo: 'blog-talk',
+        owner: 'longxiaofei',
+        admin: ['longxiaofei'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="libra.19951002@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/longxiaofei" class="iconfont icon-github" title="github"></a>
+  <a href="https://longxiaofei.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2021 - 
+    2025<span class="heart"><i class="iconfont icon-heart"></i></span><span>libra</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c99b103c33d1539acf3025e1913697534542c4a5aa5af0ccc20475ed2863603b.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -116,6 +116,29 @@
           <section id="posts" class="posts">
     <article class="post">
   <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/postgresql%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%881/">Postgresql索引失效(1)</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2025-08-25 </span>
+      <div class="post-category">
+          <a href="/categories/postgresql/"> Postgresql </a>
+          </div>
+        <span class="more-meta"> 约 2609 字 </span>
+        <span class="more-meta"> 预计阅读 6 分钟 </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      案例一：批量删除历史数据导致索引失效的问题 表结构 1 2 3 4 5 6 7 8 createtableexample0(iduuidnotnullprimarykey,other_columntextnotnull,created_attimestampwithtimezone);createindexidx_example0_created_atonexample0(created_at); 业务背景 表example1大概存储了五年的数据，大概有5亿条数据。 表没有做
+    </div>
+    <div class="read-more">
+      <a href="/post/postgresql%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%881/" class="read-more-link">阅读更多</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
     <h1 class="post-title"><a class="post-link" href="/post/30%E4%BA%86/">30了</a></h1>
     <div class="post-meta">
       <span class="post-time"> 2025-05-20 </span>
@@ -202,29 +225,6 @@
     </div>
     <div class="read-more">
       <a href="/post/spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/" class="read-more-link">阅读更多</a>
-    </div>
-  </div>
-</article>
-
-    <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/mapreduce%E6%B5%81%E7%A8%8B/">Mapreduce流程</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> 2022-03-23 </span>
-      <div class="post-category">
-          <a href="/categories/mapreduce/"> mapreduce </a>
-          </div>
-        <span class="more-meta"> 约 617 字 </span>
-        <span class="more-meta"> 预计阅读 2 分钟 </span>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      执行过程 假设mapreduce任务有M个Map任务和R个Reduce任务。 Map阶段: input: 在进行map计算前，mapreduce会根据数据的分
-    </div>
-    <div class="read-more">
-      <a href="/post/mapreduce%E6%B5%81%E7%A8%8B/" class="read-more-link">阅读更多</a>
     </div>
   </div>
 </article>
