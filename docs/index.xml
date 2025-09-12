@@ -6,7 +6,16 @@
     <description>Recent content on libra blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 25 Aug 2025 20:00:14 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 11 Sep 2025 23:11:14 +0800</lastBuildDate><atom:link href="https://longxiaofei.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Postgresql-VACUUM干了些啥?</title>
+      <link>https://longxiaofei.github.io/post/postgresql-vacuum%E5%B9%B2%E4%BA%86%E4%BA%9B%E5%95%A5/</link>
+      <pubDate>Thu, 11 Sep 2025 23:11:14 +0800</pubDate>
+      
+      <guid>https://longxiaofei.github.io/post/postgresql-vacuum%E5%B9%B2%E4%BA%86%E4%BA%9B%E5%95%A5/</guid>
+      <description>VACUUM最主要作用是回收dead tuples所占据的存储空间，所以我们需要先了解一下postgres是如何存储数据的，什么样的操作会出现</description>
+    </item>
+    
     <item>
       <title>Postgresql索引失效(1)</title>
       <link>https://longxiaofei.github.io/post/postgresql%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%881/</link>
