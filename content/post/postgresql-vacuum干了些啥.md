@@ -57,7 +57,7 @@ VACUUM最主要作用是回收dead tuples所占据的存储空间，所以我们
 ```sql
 create table tbl
 (
-   id           uuid not null primary key,
+   id           bigint not null primary key,
    value        text not null
 );
 ```
